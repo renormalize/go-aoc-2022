@@ -10,28 +10,25 @@ import (
 
 func SolveDay1() {
 	calories := readInputIntoMemory()
-	totalCaloriePerElf := getSortedTotalCaloriesPerElf(calories)
-	lenElves := totalCaloriePerElf.Len()
-	fmt.Printf("The top Elf is carrying %d calories in total\n", totalCaloriePerElf[lenElves-1])
-	topThreeCaloriesElves := totalCaloriePerElf[lenElves-1] +
-		totalCaloriePerElf[lenElves-2] +
-		totalCaloriePerElf[lenElves-3]
+	calories.Sort()
+	lenElves := calories.Len()
+	fmt.Printf("The top Elf is carrying %d calories in total\n", calories[lenElves-1])
+	topThreeCaloriesElves := calories[lenElves-1] +
+		calories[lenElves-2] +
+		calories[lenElves-3]
 	fmt.Printf("The top three Elves are carrying %d calories in total\n", topThreeCaloriesElves)
 }
 
-func readInputIntoMemory() (calories [][]int) {
-	calories = make([][]int, 0)
-	// i is for diff people
-	var i int
+func readInputIntoMemory() (calories sort.IntSlice) {
+	calories = make(sort.IntSlice, 0)
 	inputFile, err := os.Open("day1/input1.txt")
 	if err != nil {
-		fmt.Println("Error reading the input file for day 1!")
-		fmt.Println(err.Error())
+		fmt.Println("Error reading the input file for day 1 with error: ", err)
 		return
 	}
 outer:
 	for {
-		calories = append(calories, make([]int, 0))
+		var sumCalories int
 	inner:
 		for {
 			var s string
@@ -40,29 +37,16 @@ outer:
 				break outer
 			}
 			if chars_read == 0 {
-				i++
 				break inner
 			}
 
 			calorie, err := strconv.Atoi(s)
+			sumCalories += calorie
 			if err != nil {
-				fmt.Println("Errored while converting to int")
+				fmt.Println("Errored while converting input to int")
 			}
-			calories[i] = append(calories[i], calorie)
 		}
+		calories = append(calories, sumCalories)
 	}
-	return
-}
-
-func getSortedTotalCaloriesPerElf(calories [][]int) (totalCaloriePerElf sort.IntSlice) {
-	totalCaloriePerElf = make(sort.IntSlice, 0)
-	for i := range calories {
-		var sum int = 0
-		for j := range calories[i] {
-			sum += calories[i][j]
-		}
-		totalCaloriePerElf = append(totalCaloriePerElf, sum)
-	}
-	totalCaloriePerElf.Sort()
 	return
 }
